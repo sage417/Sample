@@ -64,7 +64,7 @@ public class MessageServiceImpl implements MessageService {
         relationRepository.save(messageRelationRecipient);
 
         /**更新发件人的最近联系人 */
-        MessageContact messageContactSender = contactRepository.findOne(new ContactMultiKeys(senderUid, recipientUid));
+        MessageContact messageContactSender = contactRepository.findById(new ContactMultiKeys(senderUid, recipientUid)).orElse(null);
         if (messageContactSender != null) {
             messageContactSender.setMid(mid);
         } else {
@@ -78,7 +78,7 @@ public class MessageServiceImpl implements MessageService {
         contactRepository.save(messageContactSender);
 
         /**更新收件人的最近联系人 */
-        MessageContact messageContactRecipient = contactRepository.findOne(new ContactMultiKeys(recipientUid, senderUid));
+        MessageContact messageContactRecipient = contactRepository.findById(new ContactMultiKeys(recipientUid, senderUid)).orElse(null);
         if (messageContactRecipient != null) {
             messageContactRecipient.setMid(mid);
         } else {
@@ -96,8 +96,8 @@ public class MessageServiceImpl implements MessageService {
         redisTemplate.opsForHash().increment(recipientUid + "_C", senderUid, 1); //加会话未读
 
         /** 待推送消息发布到redis */
-        User self = userRepository.findOne(senderUid);
-        User other = userRepository.findOne(recipientUid);
+        User self = userRepository.findById(senderUid).get();
+        User other = userRepository.findById(recipientUid).get();
         MessageVO messageVO = new MessageVO(mid, content, self.getUid(), messageContactSender.getType(), other.getUid(), messageContent.getCreateTime(), self.getAvatar(), other.getAvatar(), self.getUsername(), other.getUsername());
         redisTemplate.convertAndSend(Constants.WEBSOCKET_MSG_TOPIC, JSONObject.toJSONString(messageVO));
 
@@ -120,11 +120,11 @@ public class MessageServiceImpl implements MessageService {
         if (null != relationList && !relationList.isEmpty()) {
             /** 先拼接消息索引和内容 */
             List<MessageVO> msgList = Lists.newArrayList();
-            User self = userRepository.findOne(ownerUid);
-            User other = userRepository.findOne(otherUid);
+            User self = userRepository.findById(ownerUid).orElse(null);
+            User other = userRepository.findById(otherUid).orElse(null);
             relationList.stream().forEach(relation -> {
                 Long mid = relation.getMid();
-                MessageContent contentVO = contentRepository.findOne(mid);
+                MessageContent contentVO = contentRepository.findById(mid).orElse(null);
                 if (null != contentVO) {
                     String content = contentVO.getContent();
                     MessageVO messageVO = new MessageVO(mid, content, relation.getOwnerUid(), relation.getType(), relation.getOtherUid(), relation.getCreateTime(), self.getAvatar(), other.getAvatar(), self.getUsername(), other.getUsername());
@@ -152,7 +152,7 @@ public class MessageServiceImpl implements MessageService {
     public MessageContactVO queryContacts(long ownerUid) {
         List<MessageContact> contacts = contactRepository.findMessageContactsByOwnerUidOrderByMidDesc(ownerUid);
         if (contacts != null) {
-            User user = userRepository.findOne(ownerUid);
+            User user = userRepository.findById(ownerUid).orElse(null);
             long totalUnread = 0;
             Object totalUnreadObj = redisTemplate.opsForValue().get(user.getUid() + Constants.TOTAL_UNREAD_SUFFIX);
             if (null != totalUnreadObj) {
@@ -162,8 +162,8 @@ public class MessageServiceImpl implements MessageService {
             MessageContactVO contactVO = new MessageContactVO(user.getUid(), user.getUsername(), user.getAvatar(), totalUnread);
             contacts.stream().forEach(contact -> {
                 Long mid = contact.getMid();
-                MessageContent contentVO = contentRepository.findOne(mid);
-                User otherUser = userRepository.findOne(contact.getOtherUid());
+                MessageContent contentVO = contentRepository.findById(mid).orElse(null);
+                User otherUser = userRepository.findById(contact.getOtherUid()).orElse(null);
 
                 if (null != contentVO) {
                     long convUnread = 0;

@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllUsersExcept(long exceptUid) {
         List<User> otherUsers = userRepository.findAll();
-        otherUsers.remove(userRepository.findOne(exceptUid));
+        otherUsers.remove(userRepository.findById(exceptUid).orElse(null));
         return otherUsers;
     }
 
@@ -79,8 +79,8 @@ public class UserServiceImpl implements UserService {
             final MessageContactVO contactVO = new MessageContactVO(ownerUser.getUid(), ownerUser.getUsername(), ownerUser.getAvatar(), totalUnread);
             contacts.stream().forEach(contact -> {
                 Long mid = contact.getMid();
-                MessageContent contentVO = contentRepository.findOne(mid);
-                User otherUser = userRepository.findOne(contact.getOtherUid());
+                MessageContent contentVO = contentRepository.findById(mid).orElse(null);
+                User otherUser = userRepository.findById(contact.getOtherUid()).orElse(null);
 
                 if (null != contentVO) {
                     long convUnread = 0;

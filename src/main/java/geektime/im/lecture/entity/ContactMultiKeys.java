@@ -1,7 +1,10 @@
 package geektime.im.lecture.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
+@Data
 public class ContactMultiKeys implements Serializable {
 
     protected Long ownerUid;
@@ -14,21 +17,5 @@ public class ContactMultiKeys implements Serializable {
 
     public ContactMultiKeys() {
         
-    }
-
-    public Long getOtherUid() {
-        return otherUid;
-    }
-
-    public void setOtherUid(Long otherUid) {
-        this.otherUid = otherUid;
-    }
-
-    public Long getOwnerUid() {
-        return ownerUid;
-    }
-
-    public void setOwnerUid(Long ownerUid) {
-        this.ownerUid = ownerUid;
     }
 }

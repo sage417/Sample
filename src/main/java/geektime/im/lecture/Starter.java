@@ -5,9 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-
-@SpringBootApplication(scanBasePackages = {"geektime.im.lecture"})
+@EnableJpaRepositories(basePackages = "geektime.im.lecture.dao")
+@SpringBootApplication
 @ServletComponentScan(basePackages = {"geektime.im.lecture.controller"})
 public class Starter extends SpringBootServletInitializer {
 

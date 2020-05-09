@@ -21,8 +21,17 @@ spring:
       ddl-auto: update
 
   redis:
-    host: localhost
+    host: raspberrypi
     port: 6379
+
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+  devtools:
+    livereload:
+      enabled: false
 
 websocket:
   connector:

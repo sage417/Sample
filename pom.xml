@@ -20,8 +20,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <netty.version>4.1.39.Final</netty.version>
-        <springboot.version>1.5.22.RELEASE</springboot.version>
+        <netty.version>4.1.42.Final</netty.version>
         <fastjson.version>1.2.59</fastjson.version>
         <guava.version>28.1-jre</guava.version>
         <h2.version>1.4.199</h2.version>
@@ -29,6 +28,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -91,10 +95,5 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>it.ozimov</groupId>
-            <artifactId>embedded-redis</artifactId>
-            <version>${embededRedis.version}</version>
-        </dependency>
     </dependencies>
 </project>

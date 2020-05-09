@@ -25,6 +25,7 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.EventExecutorGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class WebSocketServer {
+public class WebSocketServer implements DisposableBean {
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketServer.class);
 
@@ -87,8 +88,6 @@ public class WebSocketServer {
 
         channelFuture = bootstrap.bind(serverConfig.port).sync();
 
-        Runtime.getRuntime().addShutdownHook(new ShutdownThread());
-
         log.info("WebSocket Server start succ on:" + serverConfig.port);
 
         new Thread() {
@@ -105,12 +104,9 @@ public class WebSocketServer {
         }.start();
     }
 
-
-    class ShutdownThread extends Thread {
-        @Override
-        public void run() {
-            close();
-        }
+    @Override
+    public void destroy() throws Exception {
+        close();
     }
 
     public void close() {
@@ -125,10 +121,10 @@ public class WebSocketServer {
             channelFuture = null;
         }
         if (bootstrap != null && bootstrap.config().group() != null) {
-            bootstrap.config().group().shutdownGracefully();
+            bootstrap.config().group().shutdownGracefully().awaitUninterruptibly();
         }
         if (bootstrap != null && bootstrap.config().childGroup() != null) {
-            bootstrap.config().childGroup().shutdownGracefully();
+            bootstrap.config().childGroup().shutdownGracefully().awaitUninterruptibly();
         }
         bootstrap = null;
 
